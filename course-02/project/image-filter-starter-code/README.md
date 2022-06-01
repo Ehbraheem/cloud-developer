@@ -46,3 +46,10 @@ Prevent requests without valid authentication headers.
 
 Add your own domain name and have it point to the running services (try adding a subdomain name to point to the processing server)
 > !NOTE: Domain names are not included in AWS’ free tier and will incur a cost.
+
+
+# My submission
+- I have implemented the image filtering endpoint in the server.ts file.
+- I have added Postman collection that contains sample request to this service.
+- I added the screenshot of my EB deployment to the  `./deployment_screenshots` folder.
+- Because of time and resources constraint, I have not implemented any of the stand out features.
