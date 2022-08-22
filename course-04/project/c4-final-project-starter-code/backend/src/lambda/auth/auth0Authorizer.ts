@@ -57,11 +57,12 @@ export const handler = async (
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
+  const cert = await getCertificate(jwt.header.kid)
 
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  return verify(token, await getCertificate(jwt.header.kid)) as JwtPayload
+  return verify(token, certToPEM(cert), { algorithms: ['RS256'] }) as JwtPayload
 }
 
 function getToken(authHeader: string): string {
@@ -83,4 +84,11 @@ async function getCertificate(kid: string): Promise<string> {
   if (!signingKey) throw new Error('Invalid signing key')
 
   return signingKey.x5c[0]
+}
+
+function certToPEM(cert) {
+  cert = cert.match(/.{1,64}/g).join('\n')
+  cert = `-----BEGIN CERTIFICATE-----\n${cert}\n-----END CERTIFICATE-----\n`;
+
+  return cert
 }
