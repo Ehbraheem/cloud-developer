@@ -6,6 +6,7 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
 import * as createError from 'http-errors'
+import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 
 // TODO: Implement businessLogic
 
@@ -47,6 +48,7 @@ export const createTodo = async (
 export const updateTodo = (
   todoId: string,
   updateTodoRequest: UpdateTodoRequest,
+  userId: string
 ): Promise<TodoItem> => {
   const todoUpdate = {
     name: updateTodoRequest.name,
@@ -54,11 +56,14 @@ export const updateTodo = (
     done: updateTodoRequest.done
   }
 
-  return todosAccess.updateTodo(todoId, todoUpdate)
+  return todosAccess.updateTodo(todoId, todoUpdate, userId)
 }
 
-export const deleteTodo = (todoId: string): Promise<TodoItem> => {
-  return todosAccess.deleteTodo(todoId)
+export const deleteTodo = (
+  todoId: string,
+  userId: string
+): Promise<DocumentClient.DeleteItemOutput> => {
+  return todosAccess.deleteTodo(todoId, userId)
 }
 
 export const getAttachmentUrl = (todoId: string): Promise<string> => {

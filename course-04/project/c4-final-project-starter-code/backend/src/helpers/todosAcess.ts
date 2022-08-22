@@ -47,14 +47,19 @@ export class TodosAccess {
     return todoItem
   }
 
-  async updateTodo(todoId: string, todoUpdate: TodoUpdate): Promise<TodoItem> {
+  async updateTodo(
+    todoId: string,
+    todoUpdate: TodoUpdate,
+    userId: string
+  ): Promise<TodoItem> {
     logger.info('Updating todo', todoUpdate)
 
     await this.docClient
       .update({
         TableName: this.todosTable,
         Key: {
-          todoId: todoId
+          todoId: todoId,
+          userId: userId
         },
         UpdateExpression: 'set #name = :name, done = :done',
         ExpressionAttributeValues: {
@@ -67,37 +72,43 @@ export class TodosAccess {
       })
       .promise()
 
-    return await this.getTodoById(todoId)
+    return await this.getTodoById(todoId, userId)
   }
 
-  async deleteTodo(todoId: string): Promise<TodoItem> {
+  async deleteTodo(
+    todoId: string,
+    userId: string
+  ): Promise<DocumentClient.DeleteItemOutput> {
     logger.info('Deleting todo', { todoId })
 
-    await this.docClient
+    return this.docClient
       .delete({
         TableName: this.todosTable,
         Key: {
-          todoId: todoId
+          todoId,
+          userId
         }
       })
       .promise()
-
-    return await this.getTodoById(todoId)
   }
 
-  async getTodoById(todoId: string): Promise<TodoItem> {
+  async getTodoById(todoId: string, userId: string): Promise<TodoItem> {
     logger.info('Getting todo', { todoId })
 
     const result = await this.docClient
-      .get({
+      .query({
         TableName: this.todosTable,
-        Key: {
-          todoId: todoId
+        IndexName: process.env.TODOS_CREATED_AT_INDEX,
+        KeyConditionExpression: 'userId = :userId',
+        FilterExpression: 'todoId = :todoId',
+        ExpressionAttributeValues: {
+          ':todoId': todoId,
+          ':userId': userId
         }
       })
       .promise()
 
-    return result.Item as TodoItem
+    return result.Items[0] as TodoItem
   }
 }
 
