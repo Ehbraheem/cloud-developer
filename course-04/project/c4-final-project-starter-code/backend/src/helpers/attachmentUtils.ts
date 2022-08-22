@@ -8,7 +8,7 @@ const XAWS = AWSXRay.captureAWS(AWS)
 class FileStorage {
   constructor(
     private readonly s3: AWS.S3 = new XAWS.S3({ signatureVersion: 'v4' }),
-    private readonly bucketName = process.env.FILE_BUCKET,
+    private readonly bucketName = process.env.ATTACHMENT_S3_BUCKET,
     private readonly urlExpiration = process.env.SIGNED_URL_EXPIRATION
   ) {}
 
