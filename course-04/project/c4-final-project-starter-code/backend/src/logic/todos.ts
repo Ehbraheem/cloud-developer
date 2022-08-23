@@ -34,7 +34,7 @@ export const createTodo = async (
     name: createTodoRequest.name,
     dueDate: createTodoRequest.dueDate,
     done: false,
-    attachmentUrl: await attachmentUtils.getUploadUrl(todoId)
+    attachmentUrl: `https://${process.env.ATTACHMENT_S3_BUCKET}.s3.amazonaws.com/${todoId}`
   }
 
   try {
